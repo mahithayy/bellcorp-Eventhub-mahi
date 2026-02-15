@@ -1,52 +1,30 @@
 const express = require("express");
-const { events } = require("../data/db");
-const { authMiddleware } = require("../middleware/auth");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const { SECRET } = require("../middleware/auth");
+
 const router = express.Router();
 
-// Get all events (with filters & search)
-router.get("/", (req, res) => {
-  const { search, location, category, date } = req.query; // Added 'date'
-  let filtered = events;
+// Register
+router.post("/register", async (req, res) => {
+  const { email, password } = req.body;
 
-  if (search) {
-    filtered = filtered.filter(e =>
-      e.name.toLowerCase().includes(search.toLowerCase()) ||
-      e.description.toLowerCase().includes(search.toLowerCase())
-    );
-  }
+  if (await User.findOne({ email }))
+    return res.status(400).json({ message: "User exists" });
 
-  if (location) filtered = filtered.filter(e => e.location === location);
-  if (category) filtered = filtered.filter(e => e.category === category);
-  if (date) filtered = filtered.filter(e => e.datetime === date); // Simple date match
-
-  res.json(filtered);
+  const user = await User.create({ email, password });
+  res.json({ message: "Registered", user });
 });
 
-// Get single event
-router.get("/:id", (req, res) => {
-  const event = events.find(e => e.id === req.params.id);
-  res.json(event);
-});
+// Login
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-// Register for event
-router.post("/:id/register", authMiddleware, (req, res) => {
-  const event = events.find(e => e.id === req.params.id);
-  if (event.registeredUsers.includes(req.user.id))
-    return res.status(400).json({ message: "Already registered" });
-  if (event.registeredUsers.length >= event.capacity)
-    return res.status(400).json({ message: "Event full" });
+  const user = await User.findOne({ email, password });
+  if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-  event.registeredUsers.push(req.user.id);
-  res.json({ message: "Registered!" });
-});
-
-// Cancel registration
-router.post("/:id/cancel", authMiddleware, (req, res) => {
-  const event = events.find(e => e.id === req.params.id);
-  if (event) {
-    event.registeredUsers = event.registeredUsers.filter(id => id !== req.user.id);
-  }
-  res.json({ message: "Registration cancelled" });
+  const token = jwt.sign({ id: user._id, email: user.email }, SECRET);
+  res.json({ token });
 });
 
 module.exports = router;

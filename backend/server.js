@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3001;
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const userRoutes = require("./routes/userRoutes");
-
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const app = express();

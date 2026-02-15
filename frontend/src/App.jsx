@@ -14,19 +14,18 @@ const ProtectedRoute = ({ children }) => {
   React.useEffect(() => {
     const checkAuth = async () => {
       try {
-        // If this call succeeds, the cookie is valid and you are logged in
         await API.get("/user/me");
         setIsAuthenticated(true);
       } catch (error) {
         setIsAuthenticated(false);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // <--- MOVED INSIDE! Now it waits for the result.
       }
     };
     checkAuth();
   }, []);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="p-10 text-center">Loading...</div>;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return children;

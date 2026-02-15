@@ -17,11 +17,11 @@ router.get("/me", authMiddleware, async (req, res) => {
 
 router.get("/dashboard", authMiddleware, async (req, res) => {
   const events = await Event.find({ registeredUsers: req.user.id });
-
+const allPast = await Event.find({ datetime: { $lt: new Date() } });
   res.json({
     registered: events,
     upcoming: events.filter(e => new Date(e.datetime) > new Date()),
-    past: events.filter(e => new Date(e.datetime) <= new Date())
+    past: allPast
   });
 });
 

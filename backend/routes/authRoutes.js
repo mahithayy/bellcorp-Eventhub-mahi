@@ -25,22 +25,27 @@ router.post("/login", async (req, res) => {
   const token = jwt.sign({ id: user._id, email: user.email }, SECRET);
 
   // Return the user's name along with the token
- res.cookie("token", token, {
+   res.cookie("token", token, {
   httpOnly: true,
-  secure: true,      // true in production (HTTPS)
-  sameSite: "none",  // required for cross-site
+  secure: true,
+  sameSite: "none",
+  path: "/",
+});
+
 });
 
 res.json({ user: { name: user.name, email: user.email } });
 
-});
+
 // Logout endpoint
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: true, // match your login cookie settings [cite: 71]
-    sameSite: "none"
+    secure: true,
+    sameSite: "none",
+    path: "/",
   });
   res.json({ message: "Logged out" });
 });
+
 module.exports = router;

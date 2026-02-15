@@ -13,8 +13,9 @@ export default function Events() {
   });
 
   // Extract unique locations and categories for filter dropdowns
-  const locations = [...new Set(events.map(e => e.location))];
-  const categories = [...new Set(events.map(e => e.category))];
+  const locations = [...new Set(allEvents.map(e => e.location))];
+const categories = [...new Set(allEvents.map(e => e.category))];
+
 
   const fetchEvents = async () => {
     // Build query string dynamically
@@ -75,18 +76,20 @@ setEvents(res.data);
         />
       </div>
 
-      {/* Events Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.length > 0 ? (
-          events.map(e => (
-            <EventCard key={e._id} event={e} refresh={fetchEvents} />
-          ))
-        ) : (
-          <p className="col-span-full text-center text-gray-500 py-10">
-            No upcoming events found matching your filters.
-          </p>
-        )}
-      </div>
+  {/* Events Grid */}
+  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {events.length > 0 ? (
+      events
+        .filter(e => new Date(e.datetime) > new Date())
+        .map(e => (
+          <EventCard key={e._id} event={e} refresh={fetchEvents} />
+        ))
+    ) : (
+      <p className="col-span-full text-center text-gray-500 py-10">
+        No upcoming events found matching your filters.
+      </p>
+    )}
+  </div>
     </div>
   );
 }

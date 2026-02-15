@@ -7,6 +7,21 @@ export default function EventCard({ event, refresh }) {
   const spotsLeft = capacity - registeredCount;
   const isFull = spotsLeft <= 0;
 
+  // 1. Get User ID from Token to check registration status
+  const token = localStorage.getItem("token");
+  let currentUserId = null;
+  if (token) {
+    try {
+      // Simple decode of JWT payload to get ID
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      currentUserId = payload.id;
+    } catch (e) {
+      console.error("Invalid token");
+    }
+  }
+
+  const isRegistered = event.registeredUsers?.includes(currentUserId);
+
   const register = async () => {
     try {
       await API.post(`/events/${event.id}/register`);
@@ -29,7 +44,7 @@ export default function EventCard({ event, refresh }) {
             {event.category}
           </span>
           <span className="text-gray-500 text-sm font-medium">
-             {new Date(event.datetime).toLocaleDateString()}
+            {new Date(event.datetime).toLocaleDateString()}
           </span>
         </div>
 
@@ -39,34 +54,36 @@ export default function EventCard({ event, refresh }) {
 
         {/* Location */}
         <div className="flex items-center text-gray-500 text-sm mb-4">
-           📍 {event.location}
+          <span className="mr-1">📍</span> {event.location}
         </div>
 
-        {/* Description */}
+        {/* Description - Explicitly ensuring this is rendered */}
         <p className="text-gray-600 text-sm mb-4 flex-grow line-clamp-3">
           {event.description}
         </p>
 
         {/* Footer: Capacity & Button */}
         <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-            <div className="text-xs">
-                <span className="block text-gray-500">Availability</span>
-                <span className={`font-bold ${isFull ? 'text-red-500' : 'text-green-600'}`}>
-                    {isFull ? "Sold Out" : `${spotsLeft} / ${capacity} seats`}
-                </span>
-            </div>
+          <div className="text-xs">
+            <span className="block text-gray-500">Availability</span>
+            <span className={`font-bold ${isFull ? 'text-red-500' : 'text-green-600'}`}>
+              {isFull ? "Sold Out" : `${spotsLeft} / ${capacity} seats`}
+            </span>
+          </div>
 
-            <button
-              onClick={register}
-              disabled={isFull}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors
-                ${isFull
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md'
-                }`}
-            >
-              {isFull ? "Full" : "Register"}
-            </button>
+          <button
+            onClick={register}
+            // Disable if full OR if already registered
+            disabled={isFull || isRegistered}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-md
+              ${(isFull || isRegistered)
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none' // Disabled style
+                : 'bg-indigo-600 hover:bg-indigo-700 text-white' // Active style
+              }`}
+          >
+            {/* Logic to change button text */}
+            {isRegistered ? "Registered" : isFull ? "Full" : "Register"}
+          </button>
         </div>
       </div>
     </div>

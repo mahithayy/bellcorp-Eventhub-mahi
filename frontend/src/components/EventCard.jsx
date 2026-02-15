@@ -10,6 +10,7 @@ export default function EventCard({ event, refresh }) { // REMOVED "async"
             .then(res => setUserId(res.data._id))
             .catch(err => console.log("Not logged in"));
     }, []);
+const isPast = new Date(event.datetime) < new Date();
 
     const registeredCount = event.registeredUsers?.length || 0;
     const capacity = event.capacity || 0;
@@ -62,14 +63,14 @@ export default function EventCard({ event, refresh }) { // REMOVED "async"
                     </div>
                     <button
                         onClick={register}
-                        disabled={isFull || isRegistered}
+                        disabled={isFull || isRegistered || isPast}
                         className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-md ${
-                            (isFull || isRegistered)
+                            (isFull || isRegistered || isPast)
                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
                                 : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                         }`}
                     >
-                        {isRegistered ? "Registered" : isFull ? "Full" : "Register"}
+                        {isPast ? "Event Ended" : isRegistered ? "Registered" : isFull ? "Full" : "Register"}
                     </button>
                 </div>
             </div>

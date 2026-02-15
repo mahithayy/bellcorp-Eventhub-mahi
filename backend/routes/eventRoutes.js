@@ -19,6 +19,16 @@ router.get("/", async (req, res) => {
     if (category) {
       query.category = category;
     }
+if (date) {
+  const selectedDate = new Date(date);
+  const nextDay = new Date(date);
+  nextDay.setDate(nextDay.getDate() + 1);
+
+  query.datetime = {
+    $gte: selectedDate.toISOString(),
+    $lt: nextDay.toISOString()
+  };
+}
 
     // Fetch events from Mongo
     const events = await Event.find(query);
@@ -32,13 +42,16 @@ router.get("/", async (req, res) => {
 router.post("/:id/register", authMiddleware, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
+
     if (!event) return res.status(404).json({ message: "Event not found" });
 
     // Check if already registered
     if (event.registeredUsers.includes(req.user.id)) {
       return res.status(400).json({ message: "Already registered" });
     }
-
+if (eventDate < new Date()) {
+  return res.status(400).json({ message: "Cannot register for past events" });
+}
     // Check capacity
     if (event.registeredUsers.length >= event.capacity) {
       return res.status(400).json({ message: "Event is full" });
@@ -57,6 +70,10 @@ router.post("/:id/cancel", authMiddleware, async (req, res) => {
     try {
       const event = await Event.findById(req.params.id);
       if (!event) return res.status(404).json({ message: "Event not found" });
+const eventDate = new Date(event.datetime);
+if (eventDate < new Date()) {
+  return res.status(400).json({ message: "Past events cannot be modified" });
+}
 
       // Remove user from array
       event.registeredUsers = event.registeredUsers.filter(

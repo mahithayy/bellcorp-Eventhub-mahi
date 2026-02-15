@@ -11,7 +11,11 @@ export default function Login() {
     try {
       // The backend sets the cookie automatically. You don't need to save anything.
       await API.post("/auth/login", form);
-await API.get("/user/me"); // ensure cookie works
+
+await API.get("/user/me");
+// ensure cookie works
+window.dispatchEvent(new Event("authChanged"));
+
 nav("/");
 
     } catch (err) {

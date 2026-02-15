@@ -18,6 +18,20 @@ export default function Navbar() { // REMOVED "async"
                 setIsLoggedIn(false);
             });
     }, []);
+useEffect(() => {
+  const fetchUser = () => {
+    API.get("/user/me")
+      .then(res => {
+        setUserName(res.data.name);
+        setIsLoggedIn(true);
+      })
+      .catch(() => setIsLoggedIn(false));
+  };
+
+  fetchUser();
+  window.addEventListener("authChanged", fetchUser);
+  return () => window.removeEventListener("authChanged", fetchUser);
+}, []);
 
     const handleLogout = async () => {
   try {

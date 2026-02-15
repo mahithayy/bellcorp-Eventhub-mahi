@@ -12,7 +12,7 @@ const app = express();
 connectDB();
 
 app.use(cors({
-  origin: "https://bellcorp-eventhub-mahi.vercel.app/",
+  origin: "https://bellcorp-eventhub-mahi.vercel.app",
   credentials: true
 }));
 

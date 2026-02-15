@@ -34,5 +34,13 @@ router.post("/login", async (req, res) => {
 res.json({ user: { name: user.name, email: user.email } });
 
 });
-
+// Logout endpoint
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true, // match your login cookie settings [cite: 71]
+    sameSite: "none"
+  });
+  res.json({ message: "Logged out" });
+});
 module.exports = router;

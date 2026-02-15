@@ -19,4 +19,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/user", userRoutes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get("/", (req, res) => {
+  res.send("API is running ");
+});
 

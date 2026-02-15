@@ -1,30 +1,73 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const { SECRET } = require("../middleware/auth");
-
 const router = express.Router();
+const Event = require("../models/Event");
+const { authMiddleware } = require("../middleware/auth");
 
-// Register
-router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+// GET /api/events - Get all events (with optional filters)
+router.get("/", async (req, res) => {
+  try {
+    const { search, location, category, date } = req.query;
+    let query = {};
 
-  if (await User.findOne({ email }))
-    return res.status(400).json({ message: "User exists" });
+    // specific search logic matching your frontend filters
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+    if (location) {
+      query.location = location;
+    }
+    if (category) {
+      query.category = category;
+    }
 
-  const user = await User.create({ email, password });
-  res.json({ message: "Registered", user });
+    // Fetch events from Mongo
+    const events = await Event.find(query);
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
-// Login
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+// POST /api/events/:id/register - Register user for an event
+router.post("/:id/register", authMiddleware, async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: "Event not found" });
 
-  const user = await User.findOne({ email, password });
-  if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    // Check if already registered
+    if (event.registeredUsers.includes(req.user.id)) {
+      return res.status(400).json({ message: "Already registered" });
+    }
 
-  const token = jwt.sign({ id: user._id, email: user.email }, SECRET);
-  res.json({ token });
+    // Check capacity
+    if (event.registeredUsers.length >= event.capacity) {
+      return res.status(400).json({ message: "Event is full" });
+    }
+
+    event.registeredUsers.push(req.user.id);
+    await event.save();
+    res.json({ message: "Registered successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
 });
+
+// POST /api/events/:id/cancel - Cancel registration
+router.post("/:id/cancel", authMiddleware, async (req, res) => {
+    try {
+      const event = await Event.findById(req.params.id);
+      if (!event) return res.status(404).json({ message: "Event not found" });
+
+      // Remove user from array
+      event.registeredUsers = event.registeredUsers.filter(
+          userId => userId.toString() !== req.user.id
+      );
+
+      await event.save();
+      res.json({ message: "Registration cancelled" });
+    } catch (err) {
+      res.status(500).json({ message: "Server Error" });
+    }
+  });
 
 module.exports = router;

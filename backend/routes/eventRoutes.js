@@ -44,7 +44,7 @@ router.post("/:id/register", authMiddleware, async (req, res) => {
     const event = await Event.findById(req.params.id);
 
     if (!event) return res.status(404).json({ message: "Event not found" });
-
+const eventDate = new Date(event.datetime);
     // Check if already registered
     if (event.registeredUsers.includes(req.user.id)) {
       return res.status(400).json({ message: "Already registered" });

@@ -7,20 +7,30 @@ import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar";
 
 // Helper component to protect routes
-const ProtectedRoute = async ({ children }) => {
-   try {
-    const isAuthenticated = await API.get("/user/me");
-    const token = isAuthenticated.data.token;
-    if (token) config.headers.Authorization = token;
-  } catch (error) {
-    console.error("Error fetching user info:", error);
-  }
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
+const ProtectedRoute = ({ children }) => {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // If this call succeeds, the cookie is valid and you are logged in
+        await API.get("/user/me");
+        setIsAuthenticated(true);
+      } catch (error) {
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
   return children;
 };
-
 export default function App() {
   return (
     <BrowserRouter>

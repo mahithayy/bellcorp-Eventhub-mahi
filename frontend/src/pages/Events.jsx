@@ -4,6 +4,7 @@ import EventCard from "../components/EventCard";
 
 export default function Events() {
   const [events, setEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState([]);
   const [filters, setFilters] = useState({
     search: "",
     location: "",
@@ -19,7 +20,13 @@ export default function Events() {
     // Build query string dynamically
     const params = new URLSearchParams(filters).toString();
     const res = await API.get(`/events?${params}`);
+setEvents(res.data);
 
+    // Only set the master list on the initial load (when filters are empty)
+    // or if you want the dropdowns to always show everything available in the DB:
+    if (allEvents.length === 0) {
+        setAllEvents(res.data);
+    }
     // FILTER: Only show future events in Explore
     const upcomingEvents = res.data.filter(e => new Date(e.datetime) > new Date());
     setEvents(upcomingEvents);

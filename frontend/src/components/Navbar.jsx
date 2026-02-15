@@ -20,16 +20,15 @@ export default function Navbar() { // REMOVED "async"
     }, []);
 
     const handleLogout = async () => {
-        try {
-            // Optional: Call backend logout if you have an endpoint for clearing cookies
-            // await API.post("/auth/logout");
-            setIsLoggedIn(false);
-            setUserName("");
-            navigate("/login");
-        } catch (e) {
-            console.error("Logout failed", e);
-        }
-    };
+  try {
+    await API.post("/auth/logout"); // Call the new backend endpoint
+    setIsLoggedIn(false);
+    setUserName("");
+    navigate("/login");
+  } catch (e) {
+    console.error("Logout failed", e);
+  }
+};
 
     return (
         <nav className="bg-gradient-to-r from-indigo-700 to-indigo-600 text-white shadow-lg">

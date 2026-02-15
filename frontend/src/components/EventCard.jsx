@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 
 export default function EventCard({ event, refresh }) { // REMOVED "async"
     const [userId, setUserId] = useState(null);
-
+const [isExpanded, setIsExpanded] = useState(false);
     // Fetch current user ID once on mount
     useEffect(() => {
         API.get("/user/me")
@@ -51,9 +51,15 @@ const isPast = new Date(event.datetime) < new Date();
                 <div className="flex items-center text-gray-500 text-sm mb-4">
                     <span>📍 {event.location}</span>
                 </div>
-                <p className="text-gray-600 text-sm mb-4 flex-grow line-clamp-3">
-                    {event.description}
-                </p>
+                <div className={`text-gray-600 text-sm mb-4 ${isExpanded ? '' : 'line-clamp-3'}`}>
+        {event.description}
+      </div>
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="text-indigo-600 text-xs font-semibold mb-4 hover:underline self-start"
+      >
+        {isExpanded ? "Show Less" : "View Description"}
+      </button>
                 <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                     <div className="text-xs">
                         <span className="block text-gray-500">Availability</span>

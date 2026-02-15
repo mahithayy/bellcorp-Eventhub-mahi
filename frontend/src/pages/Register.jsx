@@ -3,7 +3,7 @@ import API from "../api";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
 
@@ -30,6 +30,16 @@ export default function Register() {
         </div>
 
         <form onSubmit={submit} className="space-y-5">
+        <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+        <input
+            className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"
+            placeholder="Jane Doe"
+            type="text"
+            required
+            onChange={e => setForm({ ...form, name: e.target.value })}
+        />
+    </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
             <input

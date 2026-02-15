@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken");
 const SECRET = "secret123";
 
 function authMiddleware(req, res, next) {
-  const token = req.headers.authorization;
+  const token = req.cookies.token;
+
   if (!token) return res.status(401).json({ message: "No token" });
 
   try {

@@ -2,9 +2,15 @@ import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import API from "../api"; // Ensure you import your API instance
 
-export default function Navbar() {
+export default async function Navbar() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+   try {
+    const isAuthenticated = await API.get("/user/me");
+    const token = isAuthenticated.data.token;
+    if (token) config.headers.Authorization = token;
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+  }
   const [userName, setUserName] = useState(""); // State to hold the name
 
   // Fetch the user name from MongoDB when the component loads

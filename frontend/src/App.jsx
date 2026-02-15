@@ -7,8 +7,14 @@ import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar";
 
 // Helper component to protect routes
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
+const ProtectedRoute = async ({ children }) => {
+   try {
+    const isAuthenticated = await API.get("/user/me");
+    const token = isAuthenticated.data.token;
+    if (token) config.headers.Authorization = token;
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+  }
   if (!token) {
     return <Navigate to="/login" replace />;
   }

@@ -25,7 +25,14 @@ router.post("/login", async (req, res) => {
   const token = jwt.sign({ id: user._id, email: user.email }, SECRET);
 
   // Return the user's name along with the token
-  res.json({ token, user: { name: user.name, email: user.email } });
+ res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,      // true in production (HTTPS)
+  sameSite: "none",  // required for cross-site
+});
+
+res.json({ user: { name: user.name, email: user.email } });
+
 });
 
 module.exports = router;

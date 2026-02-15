@@ -1,14 +1,20 @@
 import API from "../api";
 import React from "react";
 
-export default function EventCard({ event, refresh }) {
+export default async function EventCard({ event, refresh }) {
   const registeredCount = event.registeredUsers?.length || 0;
   const capacity = event.capacity || 0;
   const spotsLeft = capacity - registeredCount;
   const isFull = spotsLeft <= 0;
 
   // 1. Get User ID from Token to check registration status
-  const token = localStorage.getItem("token");
+  try {
+    const isAuthenticated = await API.get("/user/me");
+    const token = isAuthenticated.data.token;
+    if (token) config.headers.Authorization = token;
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+  }
   let currentUserId = null;
   if (token) {
     try {

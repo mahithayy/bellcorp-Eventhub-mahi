@@ -72,7 +72,7 @@ export default function Events() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.length > 0 ? (
           events.map(e => (
-            <EventCard key={e.id} event={e} refresh={fetchEvents} />
+            <EventCard key={e._id} event={e} refresh={fetchEvents} />
           ))
         ) : (
           <p className="col-span-full text-center text-gray-500 py-10">

@@ -10,7 +10,7 @@ require("dotenv").config();
 
 const app = express();
 connectDB();
-
+app.set("trust proxy", 1);
 app.use(cors({
   origin: "https://bellcorp-eventhub-mahi.vercel.app",
   credentials: true

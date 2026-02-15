@@ -62,7 +62,7 @@ function Section({ title, events, gray, onCancel }) {
 
           return (
             <div
-              key={e.id}
+              key={e._id}
               className={`p-5 rounded-xl border flex flex-col transition-all
                 ${(gray || isPast)
                   ? 'bg-gray-50 border-gray-200 opacity-75'
@@ -88,7 +88,7 @@ function Section({ title, events, gray, onCancel }) {
                 ) : (
                   // If event is future, show Cancel Button (unless the section specifically forbids it, but here we assume 'gray' section also implies no interaction)
                   <button
-                    onClick={() => onCancel(e.id)}
+                    onClick={() => onCancel(e._id)}
                     className="text-red-500 hover:text-red-700 text-sm font-semibold px-3 py-1 rounded hover:bg-red-50 transition-colors"
                   >
                     Cancel Registration

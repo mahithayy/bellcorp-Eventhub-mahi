@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Events from "./pages/Events";
 import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar";
+import API from "./api";
 
 // Helper component to protect routes
 const ProtectedRoute = ({ children }) => {
